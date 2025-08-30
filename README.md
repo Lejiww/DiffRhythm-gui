@@ -1,5 +1,5 @@
 
-# DiffRhythm – Minimal Web GUI
+# DiffRhythm – Web GUI
 
 A modern, intuitive web interface for **[DiffRhythm](https://github.com/ASLP-lab/DiffRhythm)**
 It offers a **Simple** mode (guided presets) and an **Advanced** mode (all key parameters), plus **projects**, **prompt favorites**, **audio references**, live **model discovery + rescan**, and a rich **right-hand results panel**.
