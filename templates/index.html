@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DiffRhythm GUI</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <noscript>
+    <div style="padding:12px;background:var(--danger);color:white;text-align:center;border-radius:8px;margin:16px">
+      This UI requires JavaScript to function properly.
+    </div>
+  </noscript>
+
+  <div class="app">
+    <!-- Header -->
+    <div class="header">
+      <div class="brand">DiffRhythm</div>
+      <div class="small">{{ diff_root }}</div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="top">
+        <div class="section-title">⚙️ Configuration</div>
+        <input id="base_dir" type="text" value="{{ base_dir }}" placeholder="Base directory..." />
+        <button class="primary" onclick="saveDefaults()">💾 Save Settings</button>
+      </div>
+
+      <div class="favorites-section">
+        <div class="section-title">⭐ Prompt Favorites</div>
+        <div id="favorites-list">
+
+        </div>
+
+        <div class="add-favorite" onclick="addCurrentPromptToFavorites()">
+          ➕ Save Current Prompt
+        </div>
+      </div>
+
+      <!-- Projects -->
+      <div class="projects-section">
+        <div class="projects-header">
+          <div class="section-title">📁 Music Projects</div>
+          <div class="projects-subtitle">Organize your generations by project</div>
+        </div>       
+
+        <button class="add-project-btn" onclick="addProject()">
+          <div class="add-project-icon">➕</div>
+          <div class="add-project-text">
+            <div class="add-project-title">New Project</div>
+            <div class="add-project-subtitle">Create a new music project</div>
+          </div>
+        </button>
+
+        <div id="proj-list" class="projects-list"></div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <div class="card" style="margin-bottom:20px; padding:0; border:1px solid var(--border-primary); border-radius:8px; overflow:hidden;">
+        <div class="switch" style="margin:0; border:none; border-radius:0; background:transparent;">
+          <button id="btn-simple" class="active" onclick="setMode('simple')">✨ Simple</button>
+          <button id="btn-advanced" onclick="setMode('advanced')">🔧 Advanced</button>
+        </div>
+      </div>
+
+      <!-- Simple Mode -->
+      <section id="simple">
+        <div class="card">
+          <h3 style="margin-top:0; color: var(--text-primary); margin-bottom: 20px;">🎵 Simple Music Generation</h3>
+          
+          <form id="form-simple" onsubmit="event.preventDefault(); generate('simple');">
+            <!-- Reference Choice -->
+            <div class="input-group">
+              <label>
+                <input type="radio" name="ref_mode_simple" value="prompt" checked />
+                ✨ Text Prompt
+              </label>
+              <label>
+                <input type="radio" name="ref_mode_simple" value="audio" />
+                🎵 Audio Reference
+              </label>
+            </div>
+
+            <!-- Prompt Input -->
+            <div id="prompt-section-simple" style="margin-bottom: 16px;">
+              <label>✨ Music Description</label>
+              <textarea name="ref_prompt" rows="4" placeholder="solo grand piano, studio quality, no vocals"></textarea>
+            </div>
+
+            <!-- Audio Reference -->
+            <div id="audio-section-simple" style="display: none; margin-bottom: 16px;">
+              <label>🎵 Upload Audio Reference</label>
+              <div class="file-upload">
+                <input name="ref_audio" type="file" accept="audio/*" />
+              </div>
+              
+              <label style="margin-top: 12px;">🎼 Or use existing track</label>
+              <input id="ref_audio_existing_simple" name="ref_audio_existing" type="text" placeholder="Select from right panel →" readonly />
+            </div>
+
+            <!-- Basic Settings -->
+            <div class="grid grid-3" style="margin-bottom: 20px;">
+              <div>
+                <label>🤖 Model</label>
+                <div class="select-row">
+                  <select name="repo_id">
+                  <option value="ASLP-lab/DiffRhythm-1_2">DiffRhythm-1.2</option>
+                  <option value="ASLP-lab/DiffRhythm-1_1">DiffRhythm-1.1</option>
+                </select>
+                  <button type="button" class="icon-btn btn-reload-models" onclick="reloadModels()" title="Rescan models">↻</button>
+                </div>
+              </div>
+              <div>
+                <label>⏱️ Duration</label>
+                <select name="audio_length">
+                  <option value="95">95 seconds (recommended)</option>
+                  <option value="285">285 seconds</option>
+                </select>
+              </div>
+              <div>
+                <label>🎯 Quality</label>
+                <select id="quality_preset" name="quality_preset">
+                  <option value="balanced">Balanced (56 steps)</option>
+                  <option value="fast">Fast (32 steps)</option>
+                  <option value="high">High Quality (72 steps)</option>
+                </select>
+              </div>
+            </div>
+            <div class="row actions">
+              <button id="btn-generate-simple" class="primary" type="submit">🎵 Generate Music</button>
+              <button type="button" class="secondary" onclick="resetGeneration('simple')">↺ Reset</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Advanced Mode -->
+      <section id="advanced" style="display:none">
+        <div class="card">
+          <h3 style="margin-top:0; color: var(--text-primary); margin-bottom: 20px;">🔧 Advanced Music Generation</h3>
+          
+          <form id="form-advanced" onsubmit="event.preventDefault(); generate('advanced');">
+            <div class="grid grid-2" style="margin-bottom: 20px;">
+              <!-- Reference Section -->
+              <div class="card" style="background:var(--bg-tertiary); border:1px solid var(--border-secondary);">
+                <h4 style="margin-top:0; margin-bottom: 16px; color: var(--text-primary);">🎯 Reference Input</h4>
+                
+                <div class="input-group">
+                  <label>
+                    <input type="radio" name="ref_mode" value="prompt" checked /> 
+                    ✨ Text Prompt
+                  </label>
+                  <label>
+                    <input type="radio" name="ref_mode" value="audio" /> 
+                    🎵 Audio Reference
+                  </label>
+                </div>
+                
+                <div id="prompt-section" style="margin-bottom:12px;">
+                  <label>Prompt Description</label>
+                  <textarea name="ref_prompt" type="text" placeholder="solo grand piano, studio quality, no vocals" / rows="4" placeholder="Describe the music (style, mood, instruments, quality)…"></textarea>
+                </div>
+                
+                <div id="audio-section" style="display: none;">
+                  <div style="margin-bottom:12px;">
+                    <label>📁 Upload Audio Reference</label>
+                    <div class="file-upload">
+                      <input name="ref_audio" type="file" accept="audio/*" />
+                    </div>
+                  </div>
+                  
+                  <div style="margin-bottom:12px;">
+                    <label>🎼 Existing Project Audio</label>
+                    <input id="ref_audio_existing" name="ref_audio_existing" type="text" placeholder="Select from right panel →" readonly />
+                  </div>
+                </div>
+                
+                <div>
+                  <label>🔤 Lyrics File (LRC)</label>
+                  <div class="file-upload">
+                    <input name="lrc_file" type="file" accept=".lrc,.txt" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Settings Section -->
+              <div class="card" style="background:var(--bg-tertiary); border:1px solid var(--border-secondary);">
+                <h4 style="margin-top:0; margin-bottom: 16px; color: var(--text-primary);">⚙️ Generation Settings</h4>
+                
+                <div class="grid grid-2" style="margin-bottom:12px;">
+                  <div>
+                    <label>🤖 Model Repository</label>
+                    <div class="select-row">
+                      <select name="repo_id"></select>
+                      <button type="button" class="icon-btn btn-reload-models" onclick="reloadModels()" title="Rescan models">↻</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid grid-3" style="margin-bottom:12px;">
+                  <div>
+                    <label>🎯 Diffusion Steps</label>
+                    <input id="steps" name="steps" type="number" min="8" max="128" value="56" />
+                  </div>
+                  <div>
+                    <label>⚡ CFG Strength</label>
+                    <input id="cfg_strength" name="cfg_strength" type="number" step="0.1" min="0" max="10" value="3.8" />
+                  </div>
+                  <div>
+                    <label>📢 Batch Size</label>
+                    <input id="batch_infer_num" name="batch_infer_num" type="number" min="1" max="8" value="1" />
+                  </div>
+                </div>
+                
+                <div class="grid grid-2" style="margin-bottom:16px;">
+                  <div>
+                    <label>🖥️ GPU Device</label>
+                    <input id="cuda_visible_devices" name="cuda_visible_devices" type="text" placeholder="0" value="0" />
+                  </div>
+                  <div style="display: flex; align-items: end;">
+                    <label style="display:flex; align-items:center; gap:8px; margin-bottom:0; cursor: pointer;">
+                      <input id="use_chunked" name="use_chunked" type="checkbox" />
+                      🧠 Chunked Processing (Low VRAM)
+                    </label>
+                  </div>
+                </div>
+                
+                            <div class="row actions">
+              <button id="btn-generate-advanced" class="primary" type="submit">🎵 Generate Music</button>
+              <button type="button" class="secondary" onclick="resetGeneration('advanced')">↺ Reset</button>
+              <button type="button" onclick="saveDefaults()">💾 Save Defaults</button>
+            </div>
+              </div>
+            </div>
+            
+            <hr />
+            
+            <div>
+              <label>📋 Process Logs</label>
+              <textarea id="logs" class="logs" placeholder="Generation logs will appear here..." readonly></textarea>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <!-- Right panel -->
+    <aside class="right">
+      <div class="card" style="height:100%; display:flex; flex-direction:column;">
+        <div class="row" style="justify-content: space-between; margin-bottom:16px;">
+          <div style="font-weight:600; font-size:14px;">🎵 Generated Tracks</div>
+          <div class="small" style="color:var(--text-tertiary); font-size:11px;">Click to preview</div>
+        </div>
+        
+        <div id="files-box" style="flex:1; overflow-y:auto;"></div>
+      </div>
+    </aside>
+  </div>
+
+  <script src="/static/main.js"></script>
+
+  <div class="made-with" aria-label="Made with love by Le_jiww">
+    Made with <span class="heart">❤️</span> by <span class="author">Le_jiww</span>
+  </div>
+</body>
+</html>
