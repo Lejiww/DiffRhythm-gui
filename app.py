@@ -410,7 +410,10 @@ def index():
     cfg = load_config()
     base = ensure_project_base(cfg)
     return render_template("index.html", cfg=cfg, diff_root=str(DIFF_ROOT), base_dir=str(base))
-
+    
+@app.route("/favicon.ico")
+def favicon():
+    return send_from_directory(str(APP_ROOT / "static"), "favicon.ico", mimetype="image/x-icon")
 # ---------------------------------------------------------------------------
 # Routes: Config & Projects
 # ---------------------------------------------------------------------------
