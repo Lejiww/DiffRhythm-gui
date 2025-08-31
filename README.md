@@ -1,3 +1,6 @@
+<div align="center">
+  <img src="https://i.ibb.co/Xfnm9CNv/Screenshot-2025-08-31-125419.png" alt="GUI" width="80%">
+</div>
 
 # DiffRhythm – Web GUI
 
@@ -8,6 +11,32 @@ It offers a **Simple** mode (guided presets) and an **Advanced** mode (all key p
 ![Flask](https://img.shields.io/badge/Flask-3.x-lightgrey)
 ![OS](https://img.shields.io/badge/OS-Linux%20%7C%20Windows%20%7C%20macOS-informational)
 ![License](https://img.shields.io/badge/License-MIT-green)
+
+---
+
+## 📋 Table of Contents
+
+- [✨ Features](#-features)
+- [🧩 Requirements](#-requirements)
+- [🚀 Install](#-install)
+- [▶️ Run](#️-run)
+- [⚙️ Configuration & Env Vars](#️-configuration--env-vars)
+- [🔁 Model Discovery & Rescan](#-model-discovery--rescan)
+- [🧠 Simple vs Advanced](#-simple-vs-advanced)
+- [🧭 API Overview (server)](#-api-overview-server)
+- [🧹 Reset Behavior](#-reset-behavior)
+- [🛠️ Patching DiffRhythm](#️-patching-diffrhythm-if-your-inferinferpy-misses-cli-flags)
+  - [1) Create the Patch Script](#1-create-the-patch-script)
+  - [2) Run the Patch](#2-run-the-patch)
+- [📦 API Usage (JSON Example)](#-api-usage-json-example)
+- [🤝 Contributing](#-contributing)
+  - [1) Issues](#1-issues)
+  - [2) Pull Requests](#2-pull-requests)
+  - [3) Code Style](#3-code-style)
+  - [4) Review & Merge](#4-review--merge)
+- [📄 License](#-license)
+- [🙌 Credits](#-credits)
+
 ---
 
 ## ✨ Features
